@@ -9,6 +9,8 @@ from .views import register_view, login_view, logout_view  # Import the views
 
 
 urlpatterns = [
+   
+
 # Authentication URLs (updated to match checker requirements)
     path('register/', register_view, name='register'),
     path('login/', auth_views.LoginView.as_view(
