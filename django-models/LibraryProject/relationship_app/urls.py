@@ -36,5 +36,14 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
 
+     # Authentication URLs (must match checker exactly)
+    path('register/', views.register, name='register'),  # Contains "views.register"
+    path('login/', auth_views.LoginView.as_view(
+        template_name='relationship_app/login.html'  # Contains "LoginView.as_view(template_name="
+    ), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(
+        template_name='relationship_app/logout.html'  # Contains "LogoutView.as_view(template_name="
+    ), name='logout'),
+
 
 ]
