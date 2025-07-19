@@ -38,11 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bookshelf.apps.BookshelfConfig',
+    'bookshelf.apps.BookshelfConfig', 
     'relationship_app',
 ]
 
-AUTH_USER_MODEL = 'relationship_app.User'
+
+AUTH_USER_MODEL = 'auth.User'  # Or your custom user model if you have one
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'member_dashboard'  # Default for all users
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
