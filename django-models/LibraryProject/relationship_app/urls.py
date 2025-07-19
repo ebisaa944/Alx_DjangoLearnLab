@@ -5,6 +5,8 @@ from .views import add_book
 from .views import edit_book 
 from .views import delete_book 
 from .views import book_list
+from .views import register_view, login_view, logout_view  # Import the views
+
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -25,5 +27,10 @@ urlpatterns = [
     path('books/<int:pk>/delete/', delete_book, name='delete_book'),
     path('add_book/', add_book, name='add_book'),
     path('edit_book/<int:pk>/', edit_book, name='edit_book'),
+    # Authentication URLs
+    path('register/', register_view, name='register'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+
 
 ]
