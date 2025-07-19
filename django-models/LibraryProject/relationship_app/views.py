@@ -1,10 +1,34 @@
 # Create your views here.
 
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Library
 from django.views.generic.detail import DetailView
+
+def role_required(required_role):
+    def decorator(view_func):
+        @login_required
+        def wrapper(request, *args, **kwargs):
+            if request.user.role != required_role:
+                raise PermissionDenied
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+@role_required('ADMIN')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@role_required('LIBRARIAN')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@role_required('MEMBER')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
 
 def register_view(request):
     if request.method == 'POST':

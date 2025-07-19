@@ -1,3 +1,7 @@
+
+from .views import admin_view
+from .views import member_view
+from .views import librarian_view
 from .views import list_books
 from .views import logout_view
 from .views import login_view
@@ -11,4 +15,7 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('admin/', admin_view, name='admin_view'),
+    path('librarian/', librarian_view, name='librarian_view'),
+    path('member/', member_view, name='member_view'),
 ]

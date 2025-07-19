@@ -1,5 +1,18 @@
 # Create your models here.
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    class Role(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin'
+        LIBRARIAN = 'LIBRARIAN', 'Librarian'
+        MEMBER = 'MEMBER', 'Member'
+    
+    role = models.CharField(
+        max_length=10,
+        choices=Role.choices,
+        default=Role.MEMBER
+    )
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
