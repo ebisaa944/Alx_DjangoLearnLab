@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('relationship/', include('relationship_app.urls')),
     path('', RedirectView.as_view(url='relationship/books/')),
+    path('', include('relationship_app.urls')),
     # ... other paths ...
 ]
