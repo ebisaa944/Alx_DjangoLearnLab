@@ -6,6 +6,7 @@ from .views import edit_book
 from .views import delete_book 
 from .views import book_list
 from .views import register_view, login_view, logout_view  # Import the views
+from .views import list_books
 
 
 urlpatterns = [
