@@ -6,6 +6,19 @@ from .models import Book
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
+from .forms import ExampleForm
+
+def example_form_view(request):
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            return render(request, 'bookshelf/form_success.html')
+    else:
+        form = ExampleForm()
+    
+    return render(request, 'bookshelf/example_form.html', {'form': form})
+
 def safe_search(request):
     search_term = request.GET.get('q', '')
     
