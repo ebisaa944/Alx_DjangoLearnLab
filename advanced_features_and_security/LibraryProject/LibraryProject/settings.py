@@ -44,8 +44,8 @@ INSTALLED_APPS = [
 
 
 #AUTH_USER_MODEL = 'auth.User'  # Or your custom user model if you have one
-
-AUTH_USER_MODEL = 'relationship_app.CustomUser'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
+#AUTH_USER_MODEL = 'relationship_app.CustomUser'
 
 # Add these settings for media files (profile photos)
 MEDIA_URL = '/media/'
