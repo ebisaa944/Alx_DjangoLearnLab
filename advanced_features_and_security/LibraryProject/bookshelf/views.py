@@ -3,6 +3,24 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required, login_required
 from .models import Book
 
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
+def safe_search(request):
+    search_term = request.GET.get('q', '')
+    
+    # Safe ORM query - prevents SQL injection
+    results = Book.objects.filter(
+        Q(title__icontains=search_term) |
+        Q(author__icontains=search_term)
+    )
+    
+    # Never do this (vulnerable to SQL injection):
+    # query = "SELECT * FROM bookshelf_book WHERE title LIKE '%" + search_term + "%'"
+    # results = Book.objects.raw(query)
+    
+    return render(request, 'bookshelf/search_results.html', {'results': results})
+
 @login_required
 @permission_required('bookshelf.can_view', raise_exception=True)
 def book_list(request):
