@@ -61,3 +61,7 @@ def book_delete(request, pk):
     book = Book.objects.get(pk=pk)
     # Handle deletion
     return redirect('book_list')
+
+def book_list(request):
+    books = Book.objects.all()
+    return render(request, 'bookshelf/book_list.html', {'books': books})
