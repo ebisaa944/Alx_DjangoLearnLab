@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Dashboard</title>
+</head>
+<body>
+    <h1>Member Dashboard</h1>
+    <p>Welcome, {{ user.username }}! (Member)</p>
+    <p>You can browse and borrow books.</p>
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>
