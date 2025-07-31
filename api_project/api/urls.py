@@ -13,4 +13,7 @@ urlpatterns = [
     # These provide enhanced functionality
     path('books/advanced/', BookListCreate.as_view(), name='book-list-create'),
     path('books/advanced/<int:pk>/', BookRetrieveUpdateDestroy.as_view(), name='book-detail'),
+
+     # Include all router-generated URLs
+    path('', include(router.urls)),  # This line must be exactly like this
 ]
