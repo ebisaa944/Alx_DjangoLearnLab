@@ -1,0 +1,16 @@
+# Django
+*.sqlite3
+*.pyc
+__pycache__/
+venv/
+.env
+*.log
+local_settings.py
+db.sqlite3
+media/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
