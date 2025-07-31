@@ -1,5 +1,9 @@
-from django.urls import path
-from .views import BookList, BookListCreate, BookRetrieveUpdateDestroy
+from django.urls import path, include
+from .views import BookList, BookViewSet, BookListCreate, BookRetrieveUpdateDestroy
+
+router = DefaultRouter()
+router.register(r'books_all', BookViewSet, basename='book')
+
 
 urlpatterns = [
     # This meets the basic requirement

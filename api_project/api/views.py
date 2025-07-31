@@ -17,3 +17,7 @@ class BookListCreate(generics.ListCreateAPIView):
 class BookRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+# New ViewSet for CRUD operations
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
