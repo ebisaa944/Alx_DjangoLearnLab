@@ -1,13 +1,10 @@
 from django_filters import rest_framework  # for checker only
-from rest_framework import generics
-from rest_framework import viewsets
+from rest_framework import generics, viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
-
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -44,7 +41,7 @@ class ListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     # Add filtering, search, ordering backends
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
     # Fields allowed for filtering
     filterset_fields = ['title', 'publication_year', 'author__name']
