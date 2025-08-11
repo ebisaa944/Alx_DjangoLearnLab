@@ -21,6 +21,11 @@
         {% endif %}
     </div>
 
+    <form action="{% url 'search' %}" method="get">
+        <input type="text" name="q" placeholder="Search blog posts..." value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+    </form>
+
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}

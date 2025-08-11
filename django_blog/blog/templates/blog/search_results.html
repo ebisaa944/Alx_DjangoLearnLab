@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<h2>Search Results for "{{ query }}"</h2>
+{% if posts %}
+    {% for post in posts %}
+        <div class="post-item">
+            <h3><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|slice:":150" }}...</p>
+            <small>By {{ post.author }} on {{ post.published_date|date:"F d, Y" }}</small>
+        </div>
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>No posts found matching your query.</p>
+{% endif %}
+{% endblock %}
