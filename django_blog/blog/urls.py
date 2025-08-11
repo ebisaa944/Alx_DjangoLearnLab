@@ -1,11 +1,14 @@
-from django.urls import path, include
-from . import views (
+from django.urls import path
+from . import views
+from .views import (
     PostListView,
     PostDetailView,
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
-    # ... other views
+    CommentCreateView,
+    CommentUpdateView,
+    CommentDeleteView
 )
 from django.contrib.auth import views as auth_views
 
@@ -17,10 +20,14 @@ urlpatterns = [
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
 
-
-    # ... other URLs
+    # User Authentication URLs
     path('register/', views.register_view, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='blog/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='blog/logout.html'), name='logout'),
     path('profile/', views.profile_view, name='profile'),
+
+    # Comment URLs
+    path('post/<int:pk>/comment/new/', CommentCreateView.as_view(), name='comment-create'),
+    path('post/<int:post_pk>/comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
+    path('post/<int:post_pk>/comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 ]
