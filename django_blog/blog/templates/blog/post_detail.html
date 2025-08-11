@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<article class="post-content">
+    <h2>{{ post.title }}</h2>
+    <p><small>By {{ post.author }} on {{ post.published_date|date:"F d, Y" }}</small></p>
+    <p>{{ post.content }}</p>
+    {% if user.is_authenticated and user.id == post.author.id %}
+        <a href="{% url 'post-update' post.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'post-delete' post.pk %}" class="btn btn-danger">Delete</a>
+    {% endif %}
+</article>
+{% endblock %}

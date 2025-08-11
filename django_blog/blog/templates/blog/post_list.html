@@ -1,0 +1,19 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<h2>Blog Posts</h2>
+<a href="{% url 'post-create' %}" class="btn btn-primary">Create New Post</a>
+{% for post in posts %}
+    <div class="post-item">
+        <h3><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h3>
+        <p>{{ post.content|slice:":150" }}...</p>
+        <small>By {{ post.author }} on {{ post.published_date|date:"F d, Y" }}</small>
+        {% if user.is_authenticated and user.id == post.author.id %}
+            <a href="{% url 'post-update' post.pk %}">Edit</a> |
+            <a href="{% url 'post-delete' post.pk %}">Delete</a>
+        {% endif %}
+    </div>
+    <hr>
+{% empty %}
+    <p>No blog posts found.</p>
+{% endfor %}
+{% endblock %}
