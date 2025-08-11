@@ -38,11 +38,17 @@ def search_view(request):
     return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
 
 # View to display posts by a specific tag
-class TaggedPostListView(ListView):
+class PostByTagListView(ListView): # Renamed from TaggedPostListView
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
 
+    def get_queryset(self):
+        slug = self.kwargs['tag_slug']
+class PostByTagListView(ListView): # Renamed from TaggedPostListView
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
         tag = get_object_or_404(Tag, slug=slug)
