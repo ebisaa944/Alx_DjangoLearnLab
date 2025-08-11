@@ -1,6 +1,8 @@
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 
@@ -32,10 +34,25 @@ class BookViewSet(viewsets.ModelViewSet):
 # Generic views for the Book model as required
 
 class ListView(generics.ListAPIView):
-    """List all books (read-only for anyone)."""
+    """List all books with filtering, searching, and ordering (read-only for anyone)."""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
+
+    # Add filtering, search, ordering backends
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # Fields allowed for filtering
+    filterset_fields = ['title', 'publication_year', 'author__name']
+
+    # Fields allowed for searching (text search)
+    search_fields = ['title', 'author__name']
+
+    # Fields allowed for ordering
+    ordering_fields = ['title', 'publication_year']
+
+    # Default ordering (optional)
+    ordering = ['title']
 
 class DetailView(generics.RetrieveAPIView):
     """Retrieve a single book by ID (read-only for anyone)."""
