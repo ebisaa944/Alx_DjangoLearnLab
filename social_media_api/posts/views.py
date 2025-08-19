@@ -55,7 +55,7 @@ class UserFeedView(generics.ListAPIView):
         Returns a queryset of posts from users the current user follows,
         ordered by creation date.
         """
-        # Get the list of users the current user is following
+        # Get the list of users the current user is following using the `following` M2M field.
         following_users = self.request.user.following.all()
 
         # Filter posts to only include those authored by followed users and the current user
