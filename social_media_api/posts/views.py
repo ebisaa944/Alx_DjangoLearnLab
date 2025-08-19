@@ -2,12 +2,10 @@
 This module defines the views for the posts app, including CRUD operations for
 posts and comments, as well as a user-specific feed.
 """
-from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from django.db.models import Q
 from rest_framework.decorators import action
 
 
@@ -18,7 +16,7 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         """
@@ -34,7 +32,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         """
@@ -48,7 +46,7 @@ class UserFeedView(generics.ListAPIView):
     A view that returns a feed of posts from users the current user follows.
     """
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -58,9 +56,5 @@ class UserFeedView(generics.ListAPIView):
         # Get the list of users the current user is following
         following_users = self.request.user.following.all()
 
-        # Include posts by followed users and the current user, ordered by most recent
-        queryset = Post.objects.filter(
-            Q(author__in=following_users) | Q(author=self.request.user)
-        ).order_by("-created_at")
-
-        return queryset
+        # Only include posts by followed users, ordered by most recent
+        return Post.objects.filter(author__in=following_users).order_by("-created_at")
