@@ -1,9 +1,13 @@
-# posts/serializers.py
-
+"""
+This module defines the serializers for the Post and Comment models.
+"""
 from rest_framework import serializers
 from .models import Post, Comment
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Comment model.
+    """
     author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
@@ -12,6 +16,9 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['author']
 
 class PostSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Post model.
+    """
     author = serializers.ReadOnlyField(source='author.username')
     comments = serializers.StringRelatedField(many=True, read_only=True)
 

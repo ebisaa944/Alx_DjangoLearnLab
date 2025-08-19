@@ -1,30 +1,66 @@
-# posts/views.py
-
-from rest_framework import viewsets, permissions, filters
+"""
+This module defines the views for the posts app, including CRUD operations for
+posts and comments, as well as a user-specific feed.
+"""
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from .permissions import IsAuthorOrReadOnly
+from django.db.models import Q
+from rest_framework.decorators import action
+
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all().order_by('-created_at')
+    """
+    A viewset that provides default `create()`, `retrieve()`, `update()`,
+    `partial_update()`, `destroy()`, and `list()` actions for posts.
+    """
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'content']
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        """
+        Automatically sets the author of a new post to the current user.
+        """
         serializer.save(author=self.request.user)
 
-class CommentViewSet(viewsets.ModelViewSet):
-    # This line is added to pass the checker's requirement
-    queryset = Comment.objects.all()
-    
-    serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
-    def get_queryset(self):
-        return Comment.objects.filter(post_id=self.kwargs['post_pk']).order_by('-created_at')
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    A viewset that provides default `create()`, `retrieve()`, `update()`,
+    `partial_update()`, `destroy()`, and `list()` actions for comments.
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        post = Post.objects.get(pk=self.kwargs['post_pk'])
-        serializer.save(author=self.request.user, post=post)
+        """
+        Automatically sets the author of a new comment to the current user.
+        """
+        serializer.save(author=self.request.user)
+
+
+class UserFeedView(generics.ListAPIView):
+    """
+    A view that returns a feed of posts from users the current user follows.
+    """
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Returns a queryset of posts from users the current user follows,
+        ordered by creation date.
+        """
+        # Get the list of users the current user is following
+        following_users = self.request.user.following.all()
+
+        # Filter posts to only include those authored by followed users and the current user
+        # This will show a user's own posts on their feed
+        queryset = Post.objects.filter(Q(author__in=following_users) | Q(author=self.request.user))
+        
+        # We'll order by the `created_at` field, which is handled in the Post model's Meta class
+        return queryset

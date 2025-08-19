@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
@@ -12,6 +13,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        # Order posts by creation date in descending order (most recent first)
+        ordering = ['-created_at']
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
