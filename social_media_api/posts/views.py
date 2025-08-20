@@ -10,7 +10,7 @@ from .serializers import PostSerializer, CommentSerializer
 from notifications.models import Notification
 from django.db.models import Q
 from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import get_object_or_404
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -32,24 +32,27 @@ class PostViewSet(viewsets.ModelViewSet):
     def like(self, request, pk=None):
         """
         Allows a user to like a specific post.
-        This alternative method explicitly checks if a like exists before creating one.
+        Uses get_object_or_404 to ensure the post exists.
+        Uses get_or_create to prevent duplicate likes and handle creation.
         """
         post = get_object_or_404(Post, pk=pk)
         user = request.user
         
-        # Check if the user has already liked this post.
-        if Like.objects.filter(user=user, post=post).exists():
-            return Response({'detail': 'You have already liked this post.'}, status=status.HTTP_409_CONFLICT)
+        # Use get_or_create to either retrieve an existing Like or create a new one.
+        # This handles the case where a user tries to like a post multiple times.
+        like, created = Like.objects.get_or_create(user=user, post=post)
         
-        # If no like exists, create one and a notification.
-        Like.objects.create(user=user, post=post)
-        Notification.objects.create(
-            recipient=post.author,
-            actor=user,
-            verb='liked',
-            target=post
-        )
-        return Response({'detail': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
+        if created:
+            # Only create a notification if the like was newly created.
+            Notification.objects.create(
+                recipient=post.author,
+                actor=user,
+                verb='liked',
+                target=post
+            )
+            return Response({'detail': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'detail': 'You have already liked this post.'}, status=status.HTTP_409_CONFLICT)
 
     @action(detail=True, methods=['post'])
     def unlike(self, request, pk=None):
