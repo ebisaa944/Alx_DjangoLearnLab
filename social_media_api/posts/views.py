@@ -1,6 +1,6 @@
 """
 This module defines the views for the posts app, including CRUD operations for
-posts and comments, as well as a user-specific feed.
+posts and comments, as well as a user-specific feed and like/unlike functionality.
 """
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +28,7 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         """
         Allows a user to like a specific post.
@@ -36,17 +36,13 @@ class PostViewSet(viewsets.ModelViewSet):
         Uses get_or_create to prevent duplicate likes and handle creation.
         """
         post = get_object_or_404(Post, pk=pk)
-        user = request.user
-        
-        # Use get_or_create to either retrieve an existing Like or create a new one.
-        # This handles the case where a user tries to like a post multiple times.
-        like, created = Like.objects.get_or_create(user=user, post=post)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
         
         if created:
             # Only create a notification if the like was newly created.
             Notification.objects.create(
                 recipient=post.author,
-                actor=user,
+                actor=request.user,
                 verb='liked',
                 target=post
             )
@@ -54,16 +50,14 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             return Response({'detail': 'You have already liked this post.'}, status=status.HTTP_409_CONFLICT)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def unlike(self, request, pk=None):
         """
         Allows a user to unlike a post.
         """
         post = get_object_or_404(Post, pk=pk)
-        user = request.user
-
         try:
-            like = Like.objects.get(user=user, post=post)
+            like = Like.objects.get(user=request.user, post=post)
             like.delete()
             return Response({'detail': 'Post unliked successfully.'}, status=status.HTTP_204_NO_CONTENT)
         except Like.DoesNotExist:
@@ -85,7 +79,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         Also creates a notification for the post's author.
         """
         comment = serializer.save(author=self.request.user)
-        # Create a notification for the post's author when a new comment is made.
         Notification.objects.create(
             recipient=comment.post.author,
             actor=self.request.user,
@@ -106,10 +99,8 @@ class UserFeedView(generics.ListAPIView):
         Returns a queryset of posts from users the current user follows,
         ordered by creation date.
         """
-        # Get the list of users the current user is following using the `following` M2M field.
         following_users = self.request.user.following.all()
-        # Filter posts to only include those authored by followed users and the current user
-        queryset = Post.objects.filter(Q(author__in=following_users) | Q(author=self.request.user))
-        
-        # Explicitly order the queryset by the created_at field in descending order
-        return queryset.order_by('-created_at')
+        queryset = Post.objects.filter(
+            Q(author__in=following_users) | Q(author=self.request.user)
+        ).order_by('-created_at')  # Ensure ordering by creation date descending
+        return queryset
