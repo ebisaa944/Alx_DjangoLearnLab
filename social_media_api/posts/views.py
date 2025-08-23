@@ -2,8 +2,7 @@
 This module defines the views for the posts app, including CRUD operations for
 posts and comments, as well as a user-specific feed.
 """
-from rest_framework import viewsets, generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, generics, status, permissions
 from rest_framework.response import Response
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
@@ -20,7 +19,7 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         """
@@ -72,7 +71,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         """
@@ -94,12 +93,12 @@ class UserFeedView(generics.ListAPIView):
     ordered by creation date (most recent first).
     """
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # <- full reference
 
     def get_queryset(self):
         user = self.request.user
-        # Get the users the current user follows
+        # Get users the current user follows
         following_users = user.following.all()  # Make sure this M2M exists on your User model
 
-        # Filter posts authored by followed users, most recent first
+        # Return posts authored by followed users, most recent first
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
