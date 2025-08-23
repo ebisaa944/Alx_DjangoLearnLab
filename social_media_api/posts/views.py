@@ -93,12 +93,12 @@ class UserFeedView(generics.ListAPIView):
     ordered by creation date (most recent first).
     """
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]  # <- full reference
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         # Get users the current user follows
-        following_users = user.following.all()  # Make sure this M2M exists on your User model
+        following_users = user.following.all()  # Ensure this M2M exists on your User model
 
-        # Return posts authored by followed users, most recent first
-        return Post.objects.filter(author__in=following_users).order_by('-created_at')
+        # Return posts authored by followed users and the current user, most recent first
+        return Post.objects.filter(Q(author__in=following_users) | Q(author=user)).order_by('-created_at')
