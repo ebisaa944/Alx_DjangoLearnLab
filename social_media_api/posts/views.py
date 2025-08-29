@@ -94,8 +94,13 @@ class UserFeedView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Get users the current user follows
-        following_users = user.following.all()  # Ensure this M2M exists on your User model
+        # Get users the current user follows.
+        # This assumes your User model has a ManyToManyField named `following`.
+        following_users = user.following.all()
 
-        # Return posts authored by followed users and the current user, most recent first
-        return Post.objects.filter(Q(author__in=following_users) | Q(author=user)).order_by('-created_at')
+        # Filter for posts from users the current user is following,
+        # or posts from the current user themselves.
+        # The Q object is used to create a logical OR condition.
+        return Post.objects.filter(
+            Q(author__in=following_users) | Q(author=user)
+        ).order_by('-created_at')
